@@ -847,6 +847,14 @@ def dorm_edit_invoice(invoice_id):
         "extra_fees": extra_fees,
         "total_amount": total
     })
+    # 🔒 FIX: แก้หน่วยน้ำ/ไฟในบิล → ซิงก์มิเตอร์ห้องให้ตรงด้วย
+    # (มิเตอร์ห้อง = เลขฐานเดิม + หน่วยที่ใช้ใหม่) กันบิลถัดไปคิดเกิน
+    if cur.get("prev_water_meter") is not None and cur.get("prev_elec_meter") is not None and cur.get("room_id"):
+        new_wm = round(float(cur.get("prev_water_meter") or 0) + max(0, water_usage), 2)
+        new_em = round(float(cur.get("prev_elec_meter") or 0) + max(0, elec_usage), 2)
+        dorm_ref(dorm_id).collection("rooms").document(cur.get("room_id")).update({
+            "water_meter": new_wm, "elec_meter": new_em
+        })
     return jsonify({"success": True, "message": f"แก้ไขบิลเรียบร้อย ยอดรวมใหม่ {total:.2f} บาท"})
 
 @app.route("/api/dorm/invoices/<invoice_id>/cancel", methods=["POST"])
