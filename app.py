@@ -773,10 +773,6 @@ def dorm_generate_invoices():
         m = meters.get(doc.id)
         if m is None:
             continue  # 👈 ห้องที่ไม่ได้เลือก (ไม่มีใน meters) = ข้าม ไม่สร้างบิล
-        inv_id = f"{dorm_id}_{room.get('room_no')}_{month}_{year}"
-        if dorm_ref(dorm_id).collection("invoices").document(inv_id).get().exists:
-            errors.append(f"ห้อง {room.get('room_no')}: มีบิลเดือนนี้แล้ว")
-            continue
         try:
             new_water, new_elec = float(m["water"]), float(m["elec"])
         except (TypeError, KeyError, ValueError):
@@ -794,7 +790,7 @@ def dorm_generate_invoices():
         total = round(water_cost + elec_cost + rent + garbage_fee + service_fee + extra_total, 2)
         dorm_ref(dorm_id).collection("rooms").document(doc.id).update(
             {"water_meter": new_water, "elec_meter": new_elec})
-        dorm_ref(dorm_id).collection("invoices").document(inv_id).set({
+        dorm_ref(dorm_id).collection("invoices").document().set({
             "dorm_id": dorm_id, "month": month, "year": year, "room_id": doc.id,
             "room_no": room.get("room_no"), "tenant_name": room.get("tenant_name", ""),
             "water_usage": water_usage, "elec_usage": elec_usage,
