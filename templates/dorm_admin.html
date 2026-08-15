@@ -688,6 +688,7 @@ async function loadInvoices(){
     document.getElementById('invRows').innerHTML=invs.map(i=>{
       const stBadge=i.status==='paid'?'<span class="badge b-paid">✅ จ่ายแล้ว</span>'
         :i.status==='waiting_confirm'?'<span class="badge b-waiting">⏳ รอตรวจ</span>'
+        :i.status==='closed'?'<span class="badge b-gray">🔒 ปิดแล้ว</span>'
         :'<span class="badge b-pending">รอจ่าย</span>';
       let act='';
       if(i.status==='waiting_confirm'){ act+=`<button class="mini m-green" onclick="appr('${i.id}')">✅ อนุมัติ</button><button class="mini m-red" onclick="rej('${i.id}')">❌ ปฏิเสธ</button>`;
