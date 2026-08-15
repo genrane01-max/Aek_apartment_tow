@@ -776,6 +776,73 @@ function cancelInv(id,no){
   });
 }
 
+function closeInv(id,no){
+  askConfirm('🔒 ปิดบิล','ปิดบิลห้อง '+no+'? (ผู้เช่าออกแล้ว — บิลนี้จะไม่นับเป็นยอดค้าง)', async()=>{
+    const r=await fetch('/api/dorm/invoices/'+id+'/close',{method:'POST'}); const d=await r.json();
+    showMsg('msgInv', d.success?'✅ '+d.message:'❌ '+(d.message||'error'), d.success); loadInvoices();
+  });
+}
+
+/* ---- ออกบิลรายวัน (บิลด่วน) ---- */
+function openDailyModal(){
+  const sel=document.getElementById('dlRoom');
+  sel.innerHTML='';
+  const active=roomsCache.filter(r=>r.active!==false);
+  if(!active.length){ showMsg('msgDaily','ยังไม่มีห้องที่ใช้งาน','false'); return; }
+  active.forEach(rm=>{ sel.insertAdjacentHTML('beforeend',`<option value="${rm.id}">ห้อง ${esc(rm.room_no)} — ${esc(rm.tenant_name||'ว่าง')}</option>`); });
+  document.getElementById('dlTenant').value='';
+  document.getElementById('dlNights').value=1;
+  document.getElementById('dlRate').value='';
+  document.getElementById('dlFlat').value='';
+  document.getElementById('dlMode').value='nights';
+  dlToggleMode();
+  document.getElementById('dlMsg').className='msg';
+  document.getElementById('dlTotal').textContent='0';
+  document.getElementById('dailyModal').style.display='flex';
+}
+function dlToggleMode(){
+  const m=document.getElementById('dlMode').value;
+  document.getElementById('dlNightsWrap').style.display=(m==='nights')?'':'none';
+  document.getElementById('dlFlatWrap').style.display=(m==='flat')?'':'none';
+  dlCalc();
+}
+function dlCalc(){
+  const m=document.getElementById('dlMode').value;
+  let total=0;
+  if(m==='nights'){
+    const n=parseFloat(document.getElementById('dlNights').value)||0;
+    const r=parseFloat(document.getElementById('dlRate').value)||0;
+    total=n*r;
+  }else{
+    total=parseFloat(document.getElementById('dlFlat').value)||0;
+  }
+  document.getElementById('dlTotal').textContent=Number(total).toLocaleString('th-TH');
+}
+document.getElementById('dlNights').addEventListener('input',dlCalc);
+document.getElementById('dlRate').addEventListener('input',dlCalc);
+document.getElementById('dlFlat').addEventListener('input',dlCalc);
+async function submitDaily(){
+  const msgEl=document.getElementById('dlMsg');
+  const room_id=document.getElementById('dlRoom').value;
+  if(!room_id){ msgEl.className='msg err'; msgEl.textContent='เลือกห้องก่อน'; return; }
+  const mode=document.getElementById('dlMode').value;
+  const payload={room_id:room_id, tenant_name:document.getElementById('dlTenant').value.trim(), mode:mode};
+  if(mode==='nights'){
+    payload.nights=document.getElementById('dlNights').value;
+    payload.daily_rate=document.getElementById('dlRate').value;
+    if(!(parseFloat(payload.nights)>0 && parseFloat(payload.daily_rate)>0)){ msgEl.className='msg err'; msgEl.textContent='กรอกจำนวนคืนและราคา/คืน'; return; }
+  }else{
+    payload.flat_amount=document.getElementById('dlFlat').value;
+    if(!(parseFloat(payload.flat_amount)>0)){ msgEl.className='msg err'; msgEl.textContent='กรอกยอดรวม'; return; }
+  }
+  try{
+    const r=await fetch('/api/dorm/invoices/generate_daily',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d=await r.json();
+    msgEl.className='msg '+(d.success?'ok':'err'); msgEl.textContent=d.success?'✅ '+d.message:'❌ '+(d.message||'error');
+    if(d.success){ setTimeout(()=>{ closeModal('dailyModal'); switchTab('invoices'); loadInvoices(); },1200); }
+  }catch(e){ msgEl.className='msg err'; msgEl.textContent='❌ '+e.message; }
+}
+
 async function loadAddon(){
   try{
     const r=await fetch('/api/dorm/addon'); const d=await r.json();
