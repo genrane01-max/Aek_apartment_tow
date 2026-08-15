@@ -386,6 +386,38 @@
   </div>
 </div>
 
+<!-- ===== Modal ออกบิลรายวัน ===== -->
+<div class="modal-overlay" id="dailyModal" style="display:none;">
+  <div class="modal">
+    <span class="modal-x" onclick="closeModal('dailyModal')">✕</span>
+    <h3>⚡ ออกบิลรายวัน (บิลด่วน)</h3>
+    <label>ห้อง</label>
+    <select id="dlRoom"></select>
+    <label>ชื่อผู้เช่า (ไม่บังคับ — ว่างใช้ชื่อเดิม)</label>
+    <input id="dlTenant" placeholder="ชื่อลูกค้าชั่วคราว">
+    <label>วิธีคิดเงิน</label>
+    <select id="dlMode" onchange="dlToggleMode()">
+      <option value="nights">คิดเป็นคืน (จำนวนคืน × ราคา/คืน)</option>
+      <option value="flat">เหมายอดรวม</option>
+    </select>
+    <div id="dlNightsWrap">
+      <div class="row">
+        <div><label>จำนวนคืน</label><input id="dlNights" type="number" min="1" value="1"></div>
+        <div><label>ราคา/คืน (บาท)</label><input id="dlRate" type="number" step="0.01" placeholder="เช่น 500"></div>
+      </div>
+    </div>
+    <div id="dlFlatWrap" style="display:none;">
+      <label>ยอดรวม (บาท)</label><input id="dlFlat" type="number" step="0.01" placeholder="เช่น 1,500">
+    </div>
+    <p style="color:#d4af37; font-size:14px; margin-top:10px;">ยอดรวม: <b id="dlTotal">0</b> บาท</p>
+    <div class="modal-actions">
+      <button class="mini m-gray" onclick="closeModal('dailyModal')">ยกเลิก</button>
+      <button class="mini m-gold" onclick="submitDaily()">✅ สร้างบิล</button>
+    </div>
+    <div class="msg" id="dlMsg"></div>
+  </div>
+</div>
+
 <!-- ===== Modal ยืนยัน ===== -->
 <div class="modal-overlay" id="confirmModal" style="display:none;">
   <div class="modal" style="max-width:320px; text-align:center;">
