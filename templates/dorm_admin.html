@@ -212,17 +212,25 @@
     </div>
   </div>
   <!-- ===== ออกบิล ===== -->
-  <div class="content" id="tab-bills">
-    <div class="card">
-      <h3>🧾 สร้างบิลประจำเดือน</h3>
-      <div class="row">
-        <div><label>เดือน</label><select id="billMonth"></select></div>
-        <div><label>ปี (พ.ศ.)</label><select id="billYear"></select></div>
-      </div>
-      <button class="btn btn-gold" onclick="openGenModal()">ต่อไป — กรอกมิเตอร์แต่ละห้อง</button>
-      <div class="msg" id="msgBill"></div>
+<div class="content" id="tab-bills">
+  <!-- การ์ดที่ 1: สร้างบิลประจำเดือน -->
+  <div class="card">
+    <h3>🧾 สร้างบิลประจำเดือน</h3>
+    <div class="row">
+      <div><label>เดือน</label><select id="billMonth"></select></div>
+      <div><label>ปี (พ.ศ.)</label><select id="billYear"></select></div>
     </div>
+    <button class="btn btn-gold" onclick="openGenModal()">ต่อไป — กรอกมิเตอร์แต่ละห้อง</button>
+    <div class="msg" id="msgBill"></div>
   </div>
+
+  <!-- การ์ดที่ 2: ออกบิลรายวัน (เพิ่มใหม่) -->
+  <div class="card">
+    <h3>⚡ ออกบิลรายวัน (บิลด่วน — พักชั่วคราว)</h3>
+    <button class="btn btn-gold" onclick="openDailyModal()">⚡ ออกบิลรายวัน</button>
+    <div class="msg" id="msgDaily"></div>
+  </div>
+</div>
 
   <!-- ===== บิล/สลิป ===== -->
   <div class="content" id="tab-invoices">
